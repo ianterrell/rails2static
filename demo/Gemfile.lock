@@ -4,7 +4,7 @@ PATH
     rails2static (0.1.0)
       nokogiri (~> 1.15)
       rack-test (~> 2.0)
-      webrick
+      webrick (~> 1.8)
 
 GEM
   remote: https://rubygems.org/
