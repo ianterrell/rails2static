@@ -7,7 +7,7 @@
     <% end %>
   </p>
 
-  <%= simple_format @post.body %>
+  <%= sanitize simple_format(@post.body), tags: %w[p br code pre] %>
 </article>
 
 <p><%= link_to "&larr; Back to all posts".html_safe, root_path %></p>
