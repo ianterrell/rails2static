@@ -5,6 +5,7 @@ Gem::Specification.new do |spec|
   spec.version = Rails2static::VERSION
   spec.authors = ["Ian Terrell"]
   spec.email = ["ian.terrell@gmail.com"]
+  spec.homepage = "https://github.com/ianterrell/rails2static"
   spec.summary = "Generate a static site from a Rails app"
   spec.description = "Crawls a server-rendered Rails app via Rack::Test and outputs a deployable static site."
   spec.license = "MIT"
