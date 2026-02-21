@@ -3,7 +3,8 @@ require_relative "lib/rails2static/version"
 Gem::Specification.new do |spec|
   spec.name = "rails2static"
   spec.version = Rails2static::VERSION
-  spec.authors = ["Ian"]
+  spec.authors = ["Ian Terrell"]
+  spec.email = ["ian.terrell@gmail.com"]
   spec.summary = "Generate a static site from a Rails app"
   spec.description = "Crawls a server-rendered Rails app via Rack::Test and outputs a deployable static site."
   spec.license = "MIT"
