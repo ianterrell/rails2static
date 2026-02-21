@@ -1,0 +1,13 @@
+# Rails
+log/*
+tmp/*
+
+# Keep the development database (committed for demo purposes)
+storage/*
+!storage/development.sqlite3
+
+# Secrets
+config/master.key
+
+# Static output
+_site/

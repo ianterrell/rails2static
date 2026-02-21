@@ -36,11 +36,13 @@ This will:
 4. Copy `public/` directory files (favicon, robots.txt, etc.)
 5. Write everything to `_site/`
 
-Serve locally to verify:
+Preview the result locally:
 
 ```sh
-npx serve _site
+rake static:preview
 ```
+
+This starts a local server at http://localhost:8000 serving your generated site.
 
 ## Configuration
 
@@ -66,6 +68,23 @@ end
 - **Link Rewriter** — Rewrites `<a href>` values so links work on static hosts. Skips external links, anchors, mailto/tel, and paths with file extensions.
 - **Asset Collector** — Fetches all asset URLs found in HTML via Rack::Test. Parses CSS for `url()` and `@import` references and fetches those recursively.
 - **Writer** — Writes HTML as `path/index.html` (trailing slash mode) or `path.html`. Non-HTML content keeps its original path. Binary content uses `binwrite`.
+
+## Demo
+
+The `demo/` directory contains a fully working Rails blog app that showcases rails2static. It uses SQLite with a pre-seeded database so you can try it immediately:
+
+```sh
+cd demo
+bundle install
+rake rails2static     # generates _site/
+rake static:preview   # serves it at http://localhost:8000
+```
+
+The demo app includes:
+
+- Posts with categories (HABTM), an about page, and a shared layout
+- Admin scaffolds at `/admin` (excluded from static output)
+- 4 seed posts, 3 categories, and an about page
 
 ## License
 

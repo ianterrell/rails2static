@@ -1,0 +1,13 @@
+<article>
+  <h1><%= @post.title %></h1>
+  <p class="post-meta">
+    <%= @post.published_at.strftime("%B %d, %Y") %>
+    <% @post.categories.each do |cat| %>
+      <%= link_to cat.name, category_path(cat), class: "category-tag" %>
+    <% end %>
+  </p>
+
+  <%= simple_format @post.body %>
+</article>
+
+<p><%= link_to "&larr; Back to all posts".html_safe, root_path %></p>

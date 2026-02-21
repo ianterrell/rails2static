@@ -1,0 +1,16 @@
+<h1>Blog</h1>
+
+<div class="post-list">
+  <% @posts.each do |post| %>
+    <article>
+      <h2><%= link_to post.title, post_path(post) %></h2>
+      <p class="post-meta">
+        <%= post.published_at.strftime("%B %d, %Y") %>
+        <% post.categories.each do |cat| %>
+          <%= link_to cat.name, category_path(cat), class: "category-tag" %>
+        <% end %>
+      </p>
+      <p><%= truncate(post.body, length: 200) %></p>
+    </article>
+  <% end %>
+</div>
