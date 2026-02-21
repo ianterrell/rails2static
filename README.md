@@ -4,6 +4,8 @@ Generate a deployable static site from a server-rendered Rails app. Add the gem,
 
 Rails2static uses [Rack::Test](https://github.com/rack/rack-test) to call your Rails app directly — no running server needed. It crawls your app through the full middleware stack, rewrites links for static hosting, and collects all referenced assets.
 
+**Live example:** [rails2static.ianterrell.com](https://rails2static.ianterrell.com)
+
 ## Installation
 
 Add to your Gemfile:
@@ -61,6 +63,24 @@ Rails2static.configure do |config|
 end
 ```
 
+## Deploying
+
+The `_site/` output is plain static files that work on any host. Some options:
+
+### Cloudflare Pages
+
+Connect your GitHub repo in the Cloudflare Pages dashboard, then configure:
+
+- **Root directory:** your app's directory (e.g. `demo`)
+- **Build command:** `bundle install && rake rails2static`
+- **Build output:** `_site`
+
+Every push to main triggers a rebuild. Cloudflare also creates preview deployments for pull requests.
+
+### Other hosts
+
+Upload `_site/` to any static host — GitHub Pages, Netlify, S3, Vercel, or just `rsync` to a server.
+
 ## How it works
 
 - **Crawler** — BFS from entry paths using `Rack::Test::Session`. Normalizes paths, follows redirects internally, detects cycles, skips external links, warns on 404s.
@@ -80,11 +100,7 @@ rake rails2static     # generates _site/
 rake static:preview   # serves it at http://localhost:8000
 ```
 
-The demo app includes:
-
-- Posts with categories (HABTM), an about page, and a shared layout
-- Admin scaffolds at `/admin` (excluded from static output)
-- 4 seed posts, 3 categories, and an about page
+See it live at [rails2static.ianterrell.com](https://rails2static.ianterrell.com).
 
 ## License
 

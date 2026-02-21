@@ -1,103 +1,120 @@
 # Categories
-ruby = Category.find_or_create_by!(name: "Ruby", slug: "ruby")
-travel = Category.find_or_create_by!(name: "Travel", slug: "travel")
-tutorials = Category.find_or_create_by!(name: "Tutorials", slug: "tutorials")
+getting_started = Category.find_or_create_by!(name: "Getting Started", slug: "getting-started")
+deployment = Category.find_or_create_by!(name: "Deployment", slug: "deployment")
+how_it_works = Category.find_or_create_by!(name: "How It Works", slug: "how-it-works")
 
 # Posts
-post1 = Post.find_or_create_by!(slug: "getting-started-with-ruby") do |p|
-  p.title = "Getting Started with Ruby"
+post1 = Post.find_or_create_by!(slug: "getting-started-with-rails2static") do |p|
+  p.title = "Getting Started with Rails2static"
   p.body = <<~BODY
-    Ruby is a dynamic, open-source programming language with a focus on simplicity and productivity. It has an elegant syntax that is natural to read and easy to write.
+    Rails2static turns your Rails app into a static site. You keep writing ERB templates, using ActiveRecord, and organizing code the Rails way — then generate plain HTML files you can deploy anywhere.
 
-    Created by Yukihiro "Matz" Matsumoto in the mid-1990s, Ruby has grown into one of the most popular languages in the world, largely thanks to the Ruby on Rails web framework.
+    Installation takes about a minute. Add the gem to your Gemfile:
 
-    Here are a few things that make Ruby special:
+    gem "rails2static"
 
-    Everything is an object. In Ruby, every piece of data is an object, including numbers and even nil. This consistency makes the language predictable and fun to work with.
+    Run bundle install, then generate the initializer:
 
-    Blocks and iterators are first-class citizens. Ruby's block syntax lets you write expressive, readable code for iteration and callbacks.
+    rails generate rails2static:install
 
-    The community is welcoming. Rubyists follow the principle of MINASWAN — "Matz is nice and so we are nice." The community is known for being friendly and helpful to newcomers.
+    This creates config/initializers/rails2static.rb with sensible defaults. The most important option is exclude_patterns, which lets you skip routes that shouldn't be in the static output — like admin pages or anything behind authentication.
 
-    If you're just getting started, I'd recommend installing Ruby via rbenv or asdf, then working through the official Ruby in Twenty Minutes tutorial.
+    To generate your site, run:
+
+    rake rails2static
+
+    That's it. Your static site is now in the _site/ directory. You can preview it locally with:
+
+    rake static:preview
+
+    This starts a local server at http://localhost:8000 so you can verify everything looks right before deploying.
+
+    The key idea is that you develop your site exactly like any Rails app. Use migrations, seeds, scaffolds, partials, helpers — whatever you'd normally use. Rails2static just adds a build step that snapshots your app into static files.
   BODY
   p.published_at = 3.days.ago
   p.published = true
 end
 
-post2 = Post.find_or_create_by!(slug: "why-static-sites-still-matter") do |p|
-  p.title = "Why Static Sites Still Matter"
+post2 = Post.find_or_create_by!(slug: "deploying-to-cloudflare-pages") do |p|
+  p.title = "Deploying to Cloudflare Pages"
   p.body = <<~BODY
-    In an era of complex JavaScript frameworks and server-side rendering, static sites might seem like a step backward. But they offer compelling advantages that make them the right choice for many projects.
+    Cloudflare Pages is a great fit for rails2static sites. It supports Ruby builds natively (since Jekyll uses Ruby too), so your site builds and deploys automatically on every push.
 
-    Performance is the most obvious benefit. Static files served from a CDN load incredibly fast. There's no database query, no server-side rendering, no API call — just HTML delivered straight to the browser.
+    To set it up, connect your GitHub repository in the Cloudflare Pages dashboard, then configure the build:
 
-    Security is another major win. With no server-side code executing, the attack surface shrinks dramatically. There's no SQL injection, no server-side request forgery, no authentication bypass. The site is just files.
+    Root directory: your app's directory (e.g., "demo" if it's in a subdirectory)
+    Build command: bundle install && rake rails2static
+    Build output: _site
 
-    Hosting costs drop to nearly zero. You can host a static site on GitHub Pages, Netlify, or an S3 bucket for free or pennies per month.
+    That's all the configuration you need. Cloudflare will install your gems, run the rake task, and deploy the _site/ directory to its global CDN.
 
-    The key insight behind rails2static is that you don't have to give up your favorite tools to get these benefits. Write your site in Rails with all the conveniences you love — ERB templates, ActiveRecord, the asset pipeline — then generate static output for production.
+    You can add a custom domain in the Cloudflare dashboard under your Pages project settings. DNS is managed automatically if your domain is already on Cloudflare.
+
+    Every push to your main branch triggers a new build. Cloudflare also creates preview deployments for pull requests, so you can review changes before they go live.
+
+    Since the output is just static files on a CDN, your site loads fast everywhere in the world. There's no server to scale, no database to manage in production, and no infrastructure to worry about. Cloudflare's free tier is generous enough for most personal sites and blogs.
   BODY
   p.published_at = 1.day.ago
   p.published = true
 end
 
-post3 = Post.find_or_create_by!(slug: "a-week-in-tokyo") do |p|
-  p.title = "A Week in Tokyo"
+post3 = Post.find_or_create_by!(slug: "how-the-crawler-works") do |p|
+  p.title = "How the Crawler Works"
   p.body = <<~BODY
-    Tokyo is a city that defies expectations at every turn. Ancient temples sit in the shadow of neon-lit skyscrapers. Quiet residential streets open onto bustling shopping districts. The food ranges from hundred-year-old ramen shops to three-Michelin-star sushi counters.
+    Under the hood, rails2static uses a breadth-first crawler to discover and render every page in your app. Understanding how it works helps you get the most out of it.
 
-    Day 1-2: Shibuya and Harajuku. Start with the iconic Shibuya crossing, then wander through Harajuku's Takeshita Street. Visit Meiji Shrine for a moment of calm amid the city buzz.
+    The process starts with entry paths — by default, just "/". The crawler fetches each entry path using Rack::Test, which calls your Rails app directly through the middleware stack without an HTTP server. This means the crawl is fast and doesn't need a running process.
 
-    Day 3: Asakusa and Akihabara. Senso-ji temple in Asakusa is Tokyo's oldest, and the surrounding Nakamise shopping street is perfect for souvenirs. Then head to Akihabara for electronics and otaku culture.
+    For each HTML page it fetches, the crawler parses the response with Nokogiri and extracts all internal links: a[href], link[href], script[src], img[src], and srcset attributes. These discovered URLs get added to a queue.
 
-    Day 4-5: Day trips. Take the Shinkansen to Kamakura to see the Great Buddha, or head to Nikko for ornate shrines surrounded by cedar forests.
+    The crawler continues until the queue is empty or it hits the max_pages safety limit (default: 10,000). It tracks visited URLs to avoid cycles and skips anything matching your exclude_patterns.
 
-    Day 6-7: Shinjuku and beyond. Explore Shinjuku Gyoen garden, get lost in Golden Gai's tiny bars, and catch sunset from the Tokyo Metropolitan Government Building's free observation deck.
+    After crawling, the link rewriter adjusts href attributes so they work as static files. If trailing_slash mode is enabled (the default), /about becomes /about/index.html and links point to /about/ — which most static hosts serve correctly.
 
-    Pro tip: Get a Suica card at the airport. It works on all trains and buses and can even be used at convenience stores.
-  BODY
-  p.published_at = 5.hours.ago
-  p.published = true
-end
+    Finally, the asset collector fetches all CSS, JavaScript, images, and fonts referenced in your pages. It even parses CSS files for url() references and @import statements, fetching those recursively.
 
-post4 = Post.find_or_create_by!(slug: "building-a-static-site-generator") do |p|
-  p.title = "Building a Static Site Generator with Rails"
-  p.body = <<~BODY
-    One of the best things about Rails is how quickly you can build a content-driven site. But deploying a full Rails app just to serve what is essentially static content feels like overkill.
-
-    That's the motivation behind rails2static. It crawls your Rails app using Rack::Test, following links from a set of entry points, and writes out plain HTML files. The result is a static site that can be deployed anywhere.
-
-    Here's how it works:
-
-    1. You develop your site as a normal Rails app with models, views, and controllers.
-    2. You add rails2static to your Gemfile and configure it with an initializer.
-    3. You run rake rails2static, which boots your app, crawls all the pages, and writes them to a _site directory.
-    4. You deploy the _site directory to any static hosting provider.
-
-    The crawler is smart about following links. It parses each page with Nokogiri, extracts all internal links, and adds them to a queue. It respects your exclude patterns so admin pages and other dynamic routes don't get crawled.
-
-    This approach gives you the best of both worlds: the developer experience of Rails with the performance and simplicity of static hosting.
+    The result is a self-contained _site/ directory with everything needed to serve your site from any static host.
   BODY
   p.published_at = 2.days.ago
   p.published = true
 end
 
+post4 = Post.find_or_create_by!(slug: "why-use-rails-for-a-static-site") do |p|
+  p.title = "Why Use Rails for a Static Site?"
+  p.body = <<~BODY
+    There are plenty of static site generators out there — Jekyll, Hugo, Eleventy, Astro. So why would you use Rails?
+
+    The answer is simple: you already know Rails. If you're a Rails developer, you don't need to learn a new templating language, a new content pipeline, or a new way of organizing code. ERB, partials, helpers, layouts, the asset pipeline — it all just works.
+
+    Rails also gives you ActiveRecord, which is far more powerful than the file-based content systems most static generators use. You can model relationships between content (posts belong to categories, pages have metadata), query with scopes, and seed your database with whatever data you need. The demo app for rails2static uses a SQLite database that's committed to the repo, so the content is always available at build time.
+
+    Scaffolds are another underrated advantage. Need an admin interface to manage content? Generate a scaffold and you have full CRUD in seconds. Exclude the admin routes from the static build with an exclude pattern, and your admin interface exists only in development.
+
+    The trade-off is build time — Rails boots slower than Hugo. But for sites with hundreds or even a few thousand pages, the build completes in seconds. And you only pay that cost at deploy time, not on every page view.
+
+    Rails2static bridges the gap: build with the framework you love, deploy with the simplicity of static files.
+  BODY
+  p.published_at = 5.hours.ago
+  p.published = true
+end
+
 # Assign categories
-post1.categories = [ruby, tutorials]
-post2.categories = [ruby, tutorials]
-post3.categories = [travel]
-post4.categories = [ruby, tutorials]
+post1.categories = [getting_started]
+post2.categories = [deployment]
+post3.categories = [how_it_works]
+post4.categories = [getting_started, how_it_works]
 
 # About page
 Page.find_or_create_by!(slug: "about") do |p|
   p.title = "About"
   p.body = <<~BODY
-    Welcome to my blog! I'm a software developer who loves Ruby, traveling, and sharing what I learn.
+    This is a demo site for rails2static, a Ruby gem that generates static sites from Rails apps.
 
-    This blog is built with Ruby on Rails and converted to a static site using rails2static. It's a demonstration of how you can use your favorite web framework for content sites without the overhead of running a server in production.
+    The site you're reading right now was built with Rails and converted to static HTML by running rake rails2static. It's deployed on Cloudflare Pages, which rebuilds it automatically on every push to the GitHub repository.
 
-    The source code for both rails2static and this demo blog is available on GitHub. Feel free to use it as a starting point for your own projects.
+    Rails2static lets you use everything you love about Rails — ERB templates, ActiveRecord, the asset pipeline, scaffolds — while deploying as plain static files. No server to run, no database in production, no infrastructure to manage.
+
+    Check out the source code on GitHub: https://github.com/ianterrell/rails2static
   BODY
 end
 
