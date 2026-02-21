@@ -7,8 +7,9 @@
     <%= javascript_importmap_tags %>
     <style>
       body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 0 auto; padding: 1rem; color: #333; }
-      nav { border-bottom: 2px solid #eee; padding-bottom: 1rem; margin-bottom: 2rem; }
+      nav { border-bottom: 2px solid #eee; padding-bottom: 1rem; margin-bottom: 2rem; display: flex; align-items: center; }
       nav a { margin-right: 1.5rem; text-decoration: none; color: #0066cc; font-weight: 500; }
+      nav .github { margin-left: auto; margin-right: 0; }
       nav a:hover { text-decoration: underline; }
       .post-meta { color: #666; font-size: 0.9rem; margin-bottom: 0.5rem; }
       .post-list article { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #eee; }
@@ -27,6 +28,7 @@
       <%= link_to "Home", root_path %>
       <%= link_to "About", page_path("about") %>
       <%= link_to "Categories", categories_path %>
+      <%= link_to "GitHub", "https://github.com/ianterrell/rails2static", class: "github" %>
     </nav>
 
     <%= yield %>
