@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rack-test", "~> 2.0"
   spec.add_dependency "nokogiri", "~> 1.15"
-  spec.add_dependency "webrick"
+  spec.add_dependency "webrick", "~> 1.8"
 
   spec.add_development_dependency "rspec", "~> 3.12"
 end
